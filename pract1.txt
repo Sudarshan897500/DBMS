@@ -1,0 +1,74 @@
+-- Create Tables
+CREATE TABLE Customer (
+    cust_no INT PRIMARY KEY,
+    fname VARCHAR(255),
+    lname VARCHAR(255)
+);
+
+CREATE TABLE Cust_Acc_FD_Details (
+    custno INT,
+    acc_fd_no INT PRIMARY KEY
+);
+
+CREATE TABLE fd_details (
+    acc_fd_no INT PRIMARY KEY,
+    amt DECIMAL(10, 2)
+);
+
+CREATE TABLE address_details (
+    code_no INT PRIMARY KEY,
+    add1 VARCHAR(255),
+    add2 VARCHAR(255),
+    state VARCHAR(50),
+    city VARCHAR(50),
+    pincode VARCHAR(20)
+);
+
+CREATE TABLE Employee (
+    emp_no INT PRIMARY KEY,
+    f_name VARCHAR(255),
+    l_name VARCHAR(255),
+    m_name VARCHAR(255),
+    dept VARCHAR(50),
+    code_no INT
+);
+
+CREATE TABLE Contact_details (
+    code_no INT,
+    cntc_type VARCHAR(50),
+    cntc_data VARCHAR(255),
+    PRIMARY KEY (code_no, cntc_type)
+);
+
+-- Insert sample data (for illustration purposes)
+INSERT INTO Customer VALUES (1, 'John', 'Doe');
+INSERT INTO Cust_Acc_FD_Details VALUES (1, 101);
+INSERT INTO fd_details VALUES (101, 6000.00);
+INSERT INTO address_details VALUES (1, 'Street 1', 'Apt 101', 'CA', 'City1', '12345');
+INSERT INTO Employee VALUES (1001, 'Jane', 'Smith', 'M', 'HR', 1);
+INSERT INTO Contact_details VALUES (1, 'Email', 'john.doe@example.com');
+
+-- Queries
+-- i. Retrieve the address of customer Fname as 'xyz' and Lname as 'pqr'
+SELECT ad.*
+FROM address_details ad
+JOIN Customer c ON ad.code_no = c.cust_no
+WHERE c.fname = 'xyz' AND c.lname = 'pqr';
+
+-- ii. List the customer holding fixed deposit of amount more than 5000
+SELECT c.*
+FROM Customer c
+JOIN Cust_Acc_FD_Details caf ON c.cust_no = caf.custno
+JOIN fd_details fd ON caf.acc_fd_no = fd.acc_fd_no
+WHERE fd.amt > 5000;
+
+-- iii. List the employee details along with contact details using left outer join & right join.
+-- Left Outer Join
+SELECT e.*, cd.cntc_type, cd.cntc_data
+FROM Employee e
+LEFT JOIN Contact_details cd ON e.code_no = cd.code_no;
+
+-- Right Join
+SELECT e.*, cd.cntc_type, cd.cntc_data
+FROM Contact_details cd
+RIGHT JOIN Employee e ON e.code_no = cd.code_no;

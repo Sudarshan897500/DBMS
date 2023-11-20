@@ -1,0 +1,26 @@
+CREATE OR REPLACE PROCEDURE proc_Grade
+AS
+  v_rollno NUMBER;
+  v_name VARCHAR2(30);
+  v_total_marks NUMBER;
+  v_class VARCHAR2(30);
+BEGIN
+  FOR stud_row IN (SELECT rollno, name, sub1, sub2, sub3, sub4, sub5 FROM marks) LOOP
+    v_rollno := stud_row.rollno;
+    v_name := stud_row.name;
+    v_total_marks := stud_row.sub1 + stud_row.sub2 + stud_row.sub3 + stud_row.sub4 + stud_row.sub5;
+
+    IF v_total_marks <= 1500 AND v_total_marks >= 990 THEN
+      v_class := 'DISTINCTION';
+    ELSIF v_total_marks <= 989 AND v_total_marks >= 900 THEN
+      v_class := 'FIRST CLASS';
+    ELSIF v_total_marks <= 899 AND v_total_marks >= 825 THEN
+      v_class := 'HIGHER SECOND CLASS';
+    ELSE
+      v_class := 'PASS CLASS';
+    END IF;
+
+    INSERT INTO stud_marks VALUES (v_rollno, v_name, v_total_marks);
+    INSERT INTO Result VALUES (v_rollno, v_name, v_class);
+  END LOOP;
+END;

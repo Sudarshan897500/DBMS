@@ -1,0 +1,30 @@
+db.Student_Data.insertMany([
+  { "RollNo": 1, "Name": "John Doe", "Class": "SE", "dept": "Comp", "college_name": "XYZ College", "Marks_in_percentage": 75, "mobile": "1234567890", "email_id": "john.doe@example.com", "sport_status": "Y" },
+ 
+{},
+ // Add 9 more documents as needed
+]);
+db.Student_Data.updateOne(
+  { "RollNo": 1 },
+  { $set: { "mobile": "9876543210" } }
+);
+db.Student_Data.updateMany(
+  { "Class": "TE" },
+  { $set: { "Class": "BE" } }
+);
+db.Student_Data.deleteMany(
+  { "Marks_in_percentage": { $lt: 40 } }
+);
+db.Student_Data.aggregate([
+  { $sort: { "Marks_in_percentage": -1 } },
+  { $group: { _id: "$dept", toppers: { $push: "$$ROOT" } } },
+  { $project: { _id: 0, Department: "$_id", TopThreeToppers: { $slice: ["$toppers", 3] } } }
+]);
+db.Student_Data.find(
+  { "Class": "First", "sport_status": "Y" },
+  { "_id": 0, "Name": 1 }
+);
+db.Student_Data.find(
+  { $or: [ { "Class": "First" }, { "sport_status": "Y" } ] },
+  { "_id": 0, "Name": 1 }
+);

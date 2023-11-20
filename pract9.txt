@@ -1,0 +1,12 @@
+CREATE OR REPLACE TRIGGER Library_Audit_Trigger
+AFTER UPDATE OR DELETE ON Library
+FOR EACH ROW
+BEGIN
+  IF UPDATING THEN
+    INSERT INTO Library_Audit (bookid, bookname, issuedate, returndate, cardnumber)
+    VALUES (:OLD.bookid, :OLD.bookname, :OLD.issuedate, :OLD.returndate, :OLD.cardnumber);
+  ELSIF DELETING THEN
+    INSERT INTO Library_Audit (bookid, bookname, issuedate, returndate, cardnumber)
+    VALUES (:OLD.bookid, :OLD.bookname, :OLD.issuedate, :OLD.returndate, :OLD.cardnumber);
+  END IF;
+END;

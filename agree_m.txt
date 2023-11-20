@@ -1,0 +1,59 @@
+db.Student_Data.insertMany([
+  {
+    "RollNo": 1,
+    "Name": "John Doe",
+    "Class": "A",
+    "dept": "comp",
+    "college_name": "XYZ College",
+    "Marks_in_percentage": 85,
+    "mobile": "1234567890",
+    "email_id": "john.doe@example.com"
+  },
+  {
+    "RollNo": 2,
+    "Name": "Jane Doe",
+    "Class": "B",
+    "dept": "aids",
+    "college_name": "XYZ College",
+    "Marks_in_percentage": 78,
+    "mobile": "9876543210",
+    "email_id": "jane.doe@example.com"
+  },
+  {
+    "RollNo": 3,
+    "Name": "Bob Smith",
+    "Class": "C",
+    "dept": "comp",
+    "college_name": "XYZ College",
+    "Marks_in_percentage": 92,
+    "mobile": "5551234567",
+    "email_id": "bob.smith@example.com"
+  },
+  {
+    "RollNo": 4,
+    "Name": "Alice Johnson",
+    "Class": "D",
+    "dept": "aids",
+    "college_name": "XYZ College",
+    "Marks_in_percentage": 80,
+    "mobile": "9998765432",
+    "email_id": "alice.johnson@example.com"
+  }
+  // Add more sample data as needed
+]);
+db.Student_Data.aggregate([
+  { $group: { _id: "$dept", maxMarks: { $max: "$Marks_in_percentage" } } },
+  { $project: { _id: 0, Department: "$_id", MaxMarks: "$maxMarks" } }
+]);
+ db.Student_Data.aggregate([
+  { $group: { _id: "$dept", minMarks: { $min: "$Marks_in_percentage" } } },
+  { $project: { _id: 0, Department: "$_id", MinMarks: "$minMarks" } }
+]);
+db.Student_Data.aggregate([
+  { $group: { _id: "$dept", totalMarks: { $sum: "$Marks_in_percentage" } } },
+  { $project: { _id: 0, Department: "$_id", TotalMarks: "$totalMarks" } }
+]);
+db.Student_Data.aggregate([
+  { $group: { _id: "$dept", avgMarks: { $avg: "$Marks_in_percentage" } } },
+  { $project: { _id: 0, Department: "$_id", AvgMarks: "$avgMarks" } }
+]);

@@ -1,0 +1,27 @@
+db.sales.insertMany([
+  { _id: 1, amount: 100, category: "Electronics" },
+  { _id: 2, amount: 150, category: "Clothing" },
+  { _id: 3, amount: 200, category: "Electronics" },
+  { _id: 4, amount: 120, category: "Clothing" },
+  { _id: 5, amount: 180, category: "Electronics" },
+  // Add more sample data as needed
+]);
+// Map function emits key-value pairs
+var mapFunction = function () {
+  emit(this.category, this.amount);
+};
+
+// Reduce function calculates the total amount for each category
+var reduceFunction = function (key, values) {
+  return Array.sum(values);
+};
+
+// Run the map-reduce operation
+var result = db.sales.mapReduce(
+  mapFunction,
+  reduceFunction,
+  { out: "category_total_amount" }
+);
+
+// Display the result collection
+db.category_total_amount.find();

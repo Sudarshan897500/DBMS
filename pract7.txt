@@ -1,0 +1,20 @@
+DECLARE
+  v_rollno NUMBER;
+  v_name VARCHAR2(30);
+  CURSOR c_new_rollcall IS
+    SELECT Rollno, Name
+    FROM N_RollCall;
+BEGIN
+  OPEN c_new_rollcall;
+
+  LOOP
+    FETCH c_new_rollcall INTO v_rollno, v_name;
+    EXIT WHEN c_new_rollcall%NOTFOUND;
+
+    IF NOT EXISTS (SELECT 1 FROM O_RollCall WHERE Rollno = v_rollno) THEN
+      INSERT INTO O_RollCall VALUES (v_rollno, v_name);
+    END IF;
+  END LOOP;
+
+  CLOSE c_new_rollcall;
+END;

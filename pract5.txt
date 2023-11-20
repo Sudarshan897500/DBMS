@@ -1,0 +1,87 @@
+-- Create Tables
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    balance DECIMAL(10, 2),
+    CHECK (balance >= 0)
+);
+
+CREATE TABLE branch (
+    branch_name VARCHAR(255) PRIMARY KEY,
+    branch_city VARCHAR(255),
+    assets DECIMAL(15, 2),
+    CHECK (assets >= 0)
+);
+
+CREATE TABLE customer (
+    cust_name VARCHAR(255) PRIMARY KEY,
+    cust_street VARCHAR(255),
+    cust_city VARCHAR(255)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(255),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    CHECK (acc_no > 0)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    amount DECIMAL(15, 2),
+    CHECK (amount > 0)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(255),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    CHECK (loan_no > 0)
+);
+
+-- Insert sample data (for illustration purposes)
+INSERT INTO Account VALUES (1, 'Akurdi', 15000.00);
+INSERT INTO Account VALUES (2, 'Akurdi', 12000.00);
+INSERT INTO Account VALUES (3, 'Pune', 18000.00);
+INSERT INTO branch VALUES ('Akurdi', 'Pune', 100000.00);
+INSERT INTO branch VALUES ('Pune', 'Pune', 150000.00);
+INSERT INTO customer VALUES ('Customer1', 'Street1', 'City1');
+INSERT INTO Depositor VALUES ('Customer1', 1);
+INSERT INTO Depositor VALUES ('Customer1', 3);
+INSERT INTO Loan VALUES (101, 'Akurdi', 1500.00);
+INSERT INTO Loan VALUES (102, 'Pune', 2000.00);
+INSERT INTO Borrower VALUES ('Customer1', 101);
+INSERT INTO Borrower VALUES ('Customer1', 102);
+
+-- Queries
+-- i. Find all customers who have both account and loan at the bank.
+SELECT DISTINCT d.cust_name
+FROM Depositor d
+JOIN Borrower b ON d.cust_name = b.cust_name;
+
+-- ii. Find all customers who have an account but no loan at the bank.
+SELECT DISTINCT d.cust_name
+FROM Depositor d
+LEFT JOIN Borrower b ON d.cust_name = b.cust_name
+WHERE b.cust_name IS NULL;
+
+-- iii. Find average account balance at Akurdi branch.
+SELECT AVG(balance) AS avg_balance
+FROM Account
+WHERE branch_name = 'Akurdi';
+
+-- iv. Find no. of depositors at each branch.
+SELECT d.branch_name, COUNT(*) AS depositor_count
+FROM Depositor d
+JOIN Account a ON d.acc_no = a.Acc_no
+GROUP BY d.branch_name;
+
+-- v. Find the branches where average account balance > 12000.
+SELECT branch_name
+FROM (
+    SELECT branch_name, AVG(balance) AS avg_balance
+    FROM Account
+    GROUP BY branch_name
+) AS avg_balances
+WHERE avg_balance > 12000;

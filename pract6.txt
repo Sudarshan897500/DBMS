@@ -1,0 +1,22 @@
+DELIMITER // 
+create procedure proc_libr(IN Roll_no INT, IN Book_name VARCHAR (20)) 
+BEGIN 
+DECLARE fine_amt INT; 
+declare days_late int; 
+declare date_issued DATE; 
+select Date_of_Issue INTO date_issued FROM Borrower 
+WHERE Roll_no=Roll_no AND Name_of_Book= Book_name; 
+set days_late = datediff (curdate(),date_issued); 
+if days_late Between 15 and 30 then 
+set fine_amt = days_late * 5; 
+elseif days_late > 30 then 
+set fine_amt = days_late * 50; 
+else 
+set fine_amt=0; 
+end if; 
+insert into Fine(Roll_no,Date,Amount) 
+values (Roll_no,curdate(),fine_amt); 
+update Borrower 
+set Status='R' 
+WHERE Roll_no=Roll_no AND Name_of_Book=Book_name; 
+end // 

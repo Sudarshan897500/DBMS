@@ -1,0 +1,21 @@
+db.Employee.insertMany([
+  { "emp_id": 1, "emp_name": "John Smith", "emp_salary": 70000, "emp_designation": "Junior Developer", "emp_Bdate": ISODate("1990-05-15"), "emp_mobileno": "1234567890", "emp_dept": "IT" },
+  { "emp_id": 2, "emp_name": "Jane Doe", "emp_salary": 80000, "emp_designation": "Senior Developer", "emp_Bdate": ISODate("1985-09-21"), "emp_mobileno": "9876543210", "emp_dept": "HR" },
+  // Add 8 more documents as needed
+]);
+db.Employee.aggregate([
+  { $group: { _id: "$emp_dept", totalSalary: { $sum: "$emp_salary" } } }
+]);
+db.Employee.updateMany(
+  { "emp_designation": "Junior Developer" },
+  { $set: { "emp_designation": "Senior Developer" } }
+);
+var today = new Date();
+var maxBirthdate = new Date(today.getFullYear() - 60, today.getMonth(), today.getDate());
+
+db.Employee.deleteMany(
+  { "emp_Bdate": { $lt: maxBirthdate } }
+);
+db.Employee.aggregate([
+  { $project: { _id: 0, emp_name: 1, emp_salary: 1, emp_dept: 1 } }
+]);

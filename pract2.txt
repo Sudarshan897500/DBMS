@@ -1,0 +1,89 @@
+-- Create Tables
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    balance DECIMAL(10, 2)
+);
+
+CREATE TABLE branch (
+    branch_name VARCHAR(255) PRIMARY KEY,
+    branch_city VARCHAR(255),
+    assets DECIMAL(15, 2)
+);
+
+CREATE TABLE customer (
+    cust_name VARCHAR(255) PRIMARY KEY,
+    cust_street VARCHAR(255),
+    cust_city VARCHAR(255)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(255),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (acc_no) REFERENCES Account(Acc_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    amount DECIMAL(15, 2)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(255),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (loan_no) REFERENCES Loan(loan_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name)
+);
+
+-- Insert sample data (for illustration purposes)
+INSERT INTO Account VALUES (1, 'Branch1', 5000.00);
+INSERT INTO branch VALUES ('Branch1', 'City1', 100000.00);
+INSERT INTO customer VALUES ('Customer1', 'Street1', 'City1');
+INSERT INTO Depositor VALUES ('Customer1', 1);
+INSERT INTO Loan VALUES (101, 'Branch1', 10000.00);
+INSERT INTO Borrower VALUES ('Customer1', 101);
+
+-- Queries
+-- i. Create View on borrower table by selecting any two columns and perform insert update delete operations
+CREATE VIEW BorrowerView AS
+SELECT cust_name, loan_no
+FROM Borrower;
+
+-- Perform insert, update, delete operations on the view
+-- For example:
+-- INSERT INTO BorrowerView VALUES ('Customer2', 102);
+-- UPDATE BorrowerView SET loan_no = 103 WHERE cust_name = 'Customer2';
+-- DELETE FROM BorrowerView WHERE cust_name = 'Customer2';
+
+-- ii. Create view on borrower and depositor table by selecting any one column from each table
+-- Perform insert, update, delete operations on the view
+CREATE VIEW BorrowerDepositorView AS
+SELECT b.cust_name, b.loan_no, d.acc_no
+FROM Borrower b
+JOIN Depositor d ON b.cust_name = d.cust_name;
+
+-- Perform insert, update, delete operations on the view
+-- For example:
+-- INSERT INTO BorrowerDepositorView VALUES ('Customer2', 102, 2);
+-- UPDATE BorrowerDepositorView SET loan_no = 103 WHERE cust_name = 'Customer2';
+-- DELETE FROM BorrowerDepositorView WHERE cust_name = 'Customer2';
+
+-- iii. List the customer who do not have bank branches in akurdi.
+SELECT c.*
+FROM customer c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Depositor d
+    JOIN Account a ON d.acc_no = a.Acc_no
+    JOIN branch b ON a.branch_name = b.branch_name
+    WHERE c.cust_name = d.cust_name AND b.branch_city = 'Akurdi'
+);
+
+-- iv. Display the customers those who have loan accounts
+SELECT DISTINCT c.*
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name;

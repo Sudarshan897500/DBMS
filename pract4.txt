@@ -1,0 +1,81 @@
+-- Create Tables
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    balance DECIMAL(10, 2),
+    CHECK (balance >= 0)
+);
+
+CREATE TABLE branch (
+    branch_name VARCHAR(255) PRIMARY KEY,
+    branch_city VARCHAR(255),
+    assets DECIMAL(15, 2),
+    CHECK (assets >= 0)
+);
+
+CREATE TABLE customer (
+    cust_name VARCHAR(255) PRIMARY KEY,
+    cust_street VARCHAR(255),
+    cust_city VARCHAR(255)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(255),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    CHECK (acc_no > 0)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    amount DECIMAL(15, 2),
+    CHECK (amount > 0)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(255),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    CHECK (loan_no > 0)
+);
+
+-- Insert sample data (for illustration purposes)
+INSERT INTO Account VALUES (1, 'Branch1', 5000.00);
+INSERT INTO branch VALUES ('Branch1', 'City1', 100000.00);
+INSERT INTO customer VALUES ('Customer1', 'Street1', 'City1');
+INSERT INTO Depositor VALUES ('Customer1', 1);
+INSERT INTO Loan VALUES (101, 'Branch1', 15000.00);
+INSERT INTO Borrower VALUES ('Customer1', 101);
+
+-- Queries
+-- i. Find the names of all branches in loan relation.
+SELECT DISTINCT branch_name
+FROM Loan;
+
+-- ii. Find all loan numbers for loans made at Akurdi Branch with loan amount > 12000.
+SELECT loan_no
+FROM Loan
+WHERE branch_name = 'Akurdi' AND amount > 12000;
+
+-- iii. Find all customers who have a loan from the bank. Find their names, loan_no, and loan amount.
+SELECT c.cust_name, b.loan_no, l.amount
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no;
+
+-- iv. List all customers in alphabetical order who have a loan from the Akurdi branch.
+SELECT DISTINCT c.cust_name
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no
+WHERE l.branch_name = 'Akurdi'
+ORDER BY c.cust_name;
+
+-- v. Find all customers who have an account or loan or both at the bank.
+SELECT DISTINCT c.cust_name
+FROM customer c
+LEFT JOIN Depositor d ON c.cust_name = d.cust_name
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name
+WHERE d.cust_name IS NOT NULL OR b.cust_name IS NOT NULL
+ORDER BY c.cust_name;
