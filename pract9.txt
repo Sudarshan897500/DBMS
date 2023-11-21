@@ -1,12 +1,60 @@
-CREATE OR REPLACE TRIGGER Library_Audit_Trigger
-AFTER UPDATE OR DELETE ON Library
+CREATE TABLE lib_audit (
+  bookid int ,
+  bookname VARCHAR(30),
+  issuedate DATE,
+  returndate DATE,
+  cardnumber VARCHAR(10)
+);
+
+CREATE TABLE library (
+  bookid int,
+  bookname VARCHAR(30),
+  issuedate DATE,
+  returndate DATE,
+  cardnumber VARCHAR(10)
+);
+DELIMITER $$
+CREATE TRIGGER library_audit_trigger
+AFTER UPDATE
+ON library
 FOR EACH ROW
 BEGIN
-  IF UPDATING THEN
-    INSERT INTO Library_Audit (bookid, bookname, issuedate, returndate, cardnumber)
-    VALUES (:OLD.bookid, :OLD.bookname, :OLD.issuedate, :OLD.returndate, :OLD.cardnumber);
-  ELSIF DELETING THEN
-    INSERT INTO Library_Audit (bookid, bookname, issuedate, returndate, cardnumber)
-    VALUES (:OLD.bookid, :OLD.bookname, :OLD.issuedate, :OLD.returndate, :OLD.cardnumber);
-  END IF;
-END;
+  -- Insert the old values into the Lib_Audit table
+  INSERT INTO lib_audit (
+    bookid,
+    bookname,
+    issuedate,
+    returndate,
+    cardnumber
+  ) VALUES (
+    OLD.bookid,
+    OLD.bookname,
+    OLD.issuedate,
+    OLD.returndate,
+    OLD.cardnumber
+  );
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER library_delete_audit_trigger
+AFTER DELETE
+ON library
+FOR EACH ROW
+BEGIN
+  -- Insert the old values into the Lib_Audit table
+  INSERT INTO lib_audit (
+    bookid,
+    bookname,
+    issuedate,
+    returndate,
+    cardnumber
+  ) VALUES (
+    OLD.bookid,
+    OLD.bookname,
+    OLD.issuedate,
+    OLD.returndate,
+    OLD.cardnumber
+  );
+END $$
+DELIMITER ;
