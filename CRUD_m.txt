@@ -28,3 +28,34 @@ db.Student_Data.find(
   { $or: [ { "Class": "First" }, { "sport_status": "Y" } ] },
   { "_id": 0, "Name": 1 }
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+db.createCollection('mycollection')
+db.mycollection.insertOne({ name: "John Doe", age: 30 })
+db.mycollection.find({ age: { $gt: 25 } })
+db.mycollection.updateOne({ name: "John Doe" }, { $set: { age: 32 } })
+
+
