@@ -1,57 +1,23 @@
-CREATE TABLE marks(
-  rollno NUMBER(10),
-  name VARCHAR2(30),
-  sub1 NUMBER,
-  sub2 NUMBER,
-  sub3 NUMBER,
-  sub4 NUMBER,
-  sub5 NUMBER
-);
+CREATE TABLE Stud_Marks(Name VARCHAR(20),Total_marks INT);
+CREATE TABLE Result (Roll_no INT,Name VARCHAR(20),Class VARCHAR(25)); 
+ DELIMITER //
+CREATE PROCEDURE Pro_Grade (IN RollNo INT , IN Name VARCHAR(20),IN Marks INT)
+ BEGIN 
+ DECLARE Class VARCHAR (20); 
+ IF Marks >=990 AND Marks <=1500 THEN SET Class='Distinction'; 
+  ELSEIF Marks <=989 AND Marks >=900 THEN SET Class='First Class'; 
+  ELSEIF Marks <=899 AND Marks >=825 THEN SET Class='Second Class'; 
+  ELSEIF Marks <=824 AND Marks >=700 THEN SET Class=' Pass'; 
+  ELSE SET Class='Fail'; 
+  END IF; 
+  INSERT INTO Stud_Marks VALUES (Name,Marks); 
+  INSERT INTO Result VALUES (RollNo,Name,Class); 
+ END //
+Call Pro_Grade(1,'Umesh',999);
+//
 
-CREATE TABLE stud_marks(
-  rollno NUMBER(10),
-  name VARCHAR2(30),
-  total_marks NUMBER(10)
-);
-
-CREATE TABLE Result(
-  rollno NUMBER(10),
-  name VARCHAR2(30),
-  class VARCHAR2(30)
-);
-
-CREATE OR REPLACE PROCEDURE proc_Grade
-AS
-BEGIN
-  -- Calculate the total marks for each student
-  UPDATE stud_marks
-  SET total_marks = sub1 + sub2 + sub3 + sub4 + sub5;
-
-  -- Categorize students based on total marks
-  UPDATE Result
-  SET class =
-    CASE
-      WHEN total_marks <= 1500 AND total_marks >= 990 THEN 'Distinction'
-      WHEN total_marks BETWEEN 989 AND 900 THEN 'First Class'
-      WHEN total_marks BETWEEN 899 AND 825 THEN 'Higher Second Class'
-      WHEN total_marks BETWEEN 824 AND 600 THEN 'Pass Class'
-      ELSE 'Fail'
-    END
-  WHERE rollno IN (SELECT rollno FROM stud_marks);
-END;
-
--- Insert some sample data
-INSERT INTO marks VALUES (1, 'Karishma', 200, 250, 260, 270, 150);
-INSERT INTO marks VALUES (2, 'Mayuri', 210, 220, 230, 240, 250);
-INSERT INTO marks VALUES (3, 'Asim', 250, 260, 270, 280, 290);
-
--- Insert the calculated total marks into the stud_marks table
-INSERT INTO stud_marks (rollno, name, total_marks)
-SELECT rollno, name, sub1 + sub2 + sub3 + sub4 + sub5
-FROM marks;
-
--- Call the proc_Grade stored procedure to categorize students
-CALL proc_Grade;
-
--- Select the results from the Result table
-SELECT * FROM Result;
+SELECT Stud_Marks.Name, Stud_Marks.Total_marks, Result.Class
+FROM Stud_Marks
+JOIN Result
+ON Stud_Marks.Name = Result.Name;
+//
